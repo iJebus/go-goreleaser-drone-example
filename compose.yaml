@@ -1,0 +1,18 @@
+---
+version: "2"
+services:
+  gitea:
+    image: gitea/gitea:1.15.6
+    container_name: gitea
+    environment:
+      - DOMAIN=gitea
+      - SSH_PORT=2222
+    volumes:
+      - gitea:/data
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "2222:22"
+
+volumes:
+  gitea:
