@@ -1,6 +1,38 @@
 ---
 version: "2"
 services:
+  drone:
+    image: drone/drone:2
+    container_name: drone
+    environment:
+      - DRONE_SERVER_HOST=drone:8080
+      - DRONE_SERVER_PROTO=http
+      - DRONE_GITEA_CLIENT_ID=<your-client-id-here>
+      - DRONE_GITEA_CLIENT_SECRET=<your-client-secret-here>
+      - DRONE_GITEA_SERVER=http://gitea:3000
+      - DRONE_RPC_SECRET=<your-rpc-secret-here>
+      - DRONE_USER_CREATE=username:gitea,admin:true
+    volumes:
+      - drone:/data
+    ports:
+      - 8080:80
+    restart: unless-stopped
+
+  runner:
+    image: drone/drone-runner-docker:1
+    container_name: runner
+    environment:
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_HOST=drone
+      - DRONE_RPC_SECRET=<your-rpc-secret-here>
+      - DRONE_RUNNER_CAPACITY=2
+      - DRONE_RUNNER_NAME=jovial-easley
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - drone
+    restart: unless-stopped
+
   gitea:
     image: gitea/gitea:1.15.6
     container_name: gitea
@@ -15,4 +47,5 @@ services:
       - "2222:22"
 
 volumes:
-  gitea:
+  drone: null
+  gitea: null
